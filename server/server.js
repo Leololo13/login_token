@@ -7,6 +7,7 @@ require('dotenv').config();
 const { User } = require('./model/user');
 const cookieParser = require('cookie-parser');
 const { auth } = require('./middleware/auth');
+const { List } = require('./model/List');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -35,6 +36,7 @@ app.post('/api/user/register', (req, res) => {
 
 ////login=====================
 app.post('/api/user/login', (req, res) => {
+  console.log('logiin try');
   User.findOne({ email: req.body.email }, (err, userData) => {
     /////db에 이메일이 있는지?
     if (!userData)
@@ -43,15 +45,15 @@ app.post('/api/user/login', (req, res) => {
     userData.comparePassword(req.body.password, (err, isMatch) => {
       if (!isMatch)
         return res.json({ loginSuccess: false, message: 'password is wrong' });
+      userData.genToken((err, userData) => {
+        if (err) return res.status(400).send(err);
+        res
+          .cookie('accessToken', userData.token)
+          .status(200)
+          .json({ loginSuccess: true, userID: userData.id });
+      });
     });
     ///그리고 token만들어서 주기
-    userData.genToken((err, userData) => {
-      if (err) return res.status(400).send(err);
-      res
-        .cookie('accessToken', userData.token)
-        .status(200)
-        .json({ loginSuccess: true, userID: userData.id });
-    });
   });
 });
 ///인증하기
@@ -70,10 +72,18 @@ app.get('/api/user/auth', auth, (req, res) => {
 
 ///로그아웃하기
 app.get('/api/user/logout', auth, (req, res) => {
-  console.log(req.user);
   User.findOneAndUpdate({ id: req.user.id }, { token: '' }, (err, user) => {
     if (err) return res.json({ success: false, err });
     return res.status(200).send({ success: true });
+  });
+});
+///////////////////////write==============================
+
+app.post('/api/list/write', auth, (req, res) => {
+  const list = new List(req.body);
+  list.save((err, data) => {
+    if (err) return res.json({ Writesuccess: false, err });
+    return res.status(200).json({ Writesuccess: true });
   });
 });
 

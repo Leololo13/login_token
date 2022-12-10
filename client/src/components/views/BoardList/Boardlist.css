@@ -1,0 +1,12 @@
+.boardlist {
+  background-color: burlywood;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 10px;
+  gap: 10px;
+  margin-right: 20px;
+  padding-bottom: 10px;
+}

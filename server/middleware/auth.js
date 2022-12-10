@@ -4,7 +4,7 @@ let auth = (req, res, next) => {
   ///인증처리 하는곳
   //client에서 쿠키를 져온다. 즉 토큰을 가져온다.
   let token = req.cookies.accessToken;
-  console.log(token);
+
   //토큰을 decode한다음에 user를 찾아서 지금user랑 비교
   User.findByToken(token, (err, user) => {
     if (err) throw err;

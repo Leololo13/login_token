@@ -77,7 +77,6 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
 
 userSchema.methods.genToken = function (cb) {
   let user = this;
-  console.log(user, 'gen');
   let token = jwt.sign(
     {
       id: user.id,
@@ -98,9 +97,9 @@ userSchema.methods.genToken = function (cb) {
 };
 
 userSchema.statics.findByToken = function (token, cb) {
+  let user = this;
   //token decode==token에 어떤것을 넣었는지에 따라 decoded에서 뽑아내야함
   jwt.verify(token, process.env.SECRET_CODE, function (err, decoded) {
-    console.log(decoded.id, 'decod');
     user.findOne({ id: decoded.id, token: token }, (err, user) => {
       if (err) return cb(err);
       cb(null, user);
